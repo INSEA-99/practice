@@ -1,0 +1,9 @@
+[core]
+    no_scm = True
+    remote = myremote
+[cache]
+    dir = /data/dvc
+    shared = group
+    type = symlink
+['remote "myremote"']
+    url = /mnt/hdd/dvc
