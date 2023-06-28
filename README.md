@@ -6,7 +6,7 @@ Usage
 1. [Setup](#Setup)
 2. [Data Preparation](#Data-Preparation)
 3. [Execution Instructions](#Execution-Instructions)
-
+  
 ### Setup
 ```
 conda create --name openmmlab python=3.8 -y
@@ -16,7 +16,7 @@ conda activate openmmlab
 conda install pytorch torchvision -c pytorch
 pip install -e .
 ```
-
+  
 ### Data Preparation
 Prepare COCO format dataset
 
@@ -49,7 +49,7 @@ root_dir
     ├── image2.json
           '''
 ```
-
+  
 ### Execution Instructions
 create model
 ```
