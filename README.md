@@ -1,7 +1,11 @@
 Detection Module including mmdet, mmyolo
 ============
+
 Usage
 ------------
+1. [Install](#Install)
+2. [Data Preparation](#Data Preparation)
+
 ### Install
 ```
 conda create --name openmmlab python=3.8 -y
@@ -33,7 +37,7 @@ coco_root_dir
 you can use 'labelme_to_coco.py' to convert labelme format to coco format.
 ```
 python labelme_to_coco.py root_dir classes --save_dir --split_ratio
-python labelme_to_coco.py './root_dir' 'class1' 'class2' 'class3'
+python labelme_to_coco.py ./labelme_root_dir cat dog bird
 ```
 root_dir must have labelme json files and images.  
 ```
