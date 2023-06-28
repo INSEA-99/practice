@@ -3,10 +3,11 @@ Detection Module including mmdet, mmyolo
 
 Usage
 ------------
-1. [Install](#Install)
-2. [Data Preparation](#Data Preparation)
+1. [Setup](#Setup)
+2. [Data Preparation](#Data-Preparation)
+3. [Execution Instructions](#Execution-Instructions)
 
-### Install
+### Setup
 ```
 conda create --name openmmlab python=3.8 -y
 conda activate openmmlab
@@ -48,6 +49,24 @@ root_dir
     ├── image2.json
           '''
 ```
+
+### Execution Instructions
+create model
+```
+# model_type can be : mmdet, mmseg, mmpose
+# mmdet-model_name can be :
+# cascade_rcnn, dino-4scale, dino-5scale, rtmdet_tiny, rtmdet_x, yolox_l, yolov7_l, yolov8_l
+model = create_model(model_type = "mmdet", 
+                     model_name = "cascade_rcnn", 
+                     data_root= '/home/inbada/mars_module/mars/mars/mmdetection/coco_format_data/', 
+                     classes = ('hz', 'bz', 'chem'))
+```
+```
+model.train()
+model.test()
+```
+
+
 
 
 
