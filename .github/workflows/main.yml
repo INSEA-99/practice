@@ -1,7 +1,8 @@
 name: Auto Assign & Auto Merge PR
 
+
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - main
     types:
@@ -20,7 +21,7 @@ jobs:
         id: assign_reviewers
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.ORG_ACCESS_TOKEN }}
           script: |
             // 저장소 collaborator 목록 가져오기
             let members = [];
@@ -83,7 +84,7 @@ jobs:
         if: github.event_name == 'pull_request_review'
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.ORG_ACCESS_TOKEN }}
           script: |
             const pr_number = context.payload.pull_request.number;
 
