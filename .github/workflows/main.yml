@@ -11,35 +11,33 @@ jobs:
   assign-and-merge:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ PR 열릴 때: 리뷰어 지정 및 PR 본문에 기록
-      - name: Assign random contributors as reviewers & save to PR body
+      - name: Assign random collaborators as reviewers & save to PR body
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_ACCESS_TOKEN }}
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           script: |
-            // 모든 기여자 목록 불러오기 (작성자 제외)
-            let contributors = [];
+            // 현재 리포의 모든 collaborator 가져오기 (작성자 제외)
+            let collaborators = [];
             let page = 1;
             while (true) {
-              const { data } = await github.rest.repos.listContributors({
+              const { data } = await github.rest.repos.listCollaborators({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 per_page: 100,
                 page
               });
               if (data.length === 0) break;
-              contributors = contributors.concat(data.map(u => u.login));
+              collaborators = collaborators.concat(data.map(u => u.login));
               page++;
             }
-            // PR 작성자 제외
             const author = context.payload.pull_request.user.login;
-            contributors = contributors.filter(u => u !== author);
+            collaborators = collaborators.filter(u => u !== author);
 
-            // 랜덤 2명(2명 미만이면 남은 만큼)
-            const reviewers = contributors.sort(() => 0.5 - Math.random()).slice(0, 2);
+            // 랜덤 2명(또는 남은 만큼) 선정
+            const reviewers = collaborators.sort(() => 0.5 - Math.random()).slice(0, 2);
 
-            // 리뷰어 할당
+            // 리뷰어 지정
             if (reviewers.length > 0) {
               await github.rest.pulls.requestReviewers({
                 owner: context.repo.owner,
@@ -49,7 +47,7 @@ jobs:
               });
             }
 
-            // PR 본문에 리뷰어 기록 (후속 step에서 활용)
+            // PR 본문에 리뷰어 기록
             const body = context.payload.pull_request.body || "";
             const reviewersNote = `<!-- reviewers: ${reviewers.join(',')} -->`;
             await github.rest.pulls.update({
@@ -59,19 +57,16 @@ jobs:
               body: `${body}\n${reviewersNote}`
             });
 
-            console.log("Review candidate contributors:", contributors);
+            console.log("Review candidate collaborators:", collaborators);
             console.log("Assigned reviewers:", reviewers);
 
-      # 2️⃣ 리뷰 제출 시: 리뷰어 모두 승인 확인 & 자동 머지
       - name: Auto merge if reviewers all approved (or none assigned)
         if: github.event_name == 'pull_request_review'
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.ORG_ACCESS_TOKEN }}
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           script: |
             const pr_number = context.payload.pull_request.number;
-
-            // PR 본문에서 리뷰어 정보 추출
             const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -83,7 +78,7 @@ jobs:
               ? reviewersMatch[1].split(',').map(r => r.trim()).filter(r => r)
               : [];
 
-            // 리뷰어가 한 명도 없으면 바로 머지
+            // 리뷰어가 없으면 자동 머지
             if (reviewers.length === 0) {
               await github.rest.pulls.merge({
                 owner: context.repo.owner,
@@ -109,9 +104,7 @@ jobs:
               }
             });
 
-            console.log("Review states:", reviewStates);
-
-            // CHANGES_REQUESTED가 하나라도 있으면 PR 반려(닫기)
+            // CHANGES_REQUESTED가 있으면 PR 반려(닫기)
             if (Object.values(reviewStates).includes("CHANGES_REQUESTED")) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -129,7 +122,7 @@ jobs:
               return;
             }
 
-            // 모든 리뷰어가 APPROVED면 자동 머지
+            // 모든 리뷰어 APPROVED면 자동 머지
             if (reviewers.length > 0 && reviewers.every(r => reviewStates[r] === "APPROVED")) {
               await github.rest.pulls.merge({
                 owner: context.repo.owner,
