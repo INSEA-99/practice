@@ -56,10 +56,7 @@ jobs:
 
             console.log("Assigned reviewer:", reviewer);
             return reviewer;
-
-        env:
-          ORG_ACCESS_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN }}
-        token: ${{ secrets.ORG_ACCESS_TOKEN }}
+          token: ${{ secrets.ORG_ACCESS_TOKEN }}
 
       # 2️⃣ 리뷰 제출 감지 후 Close / Merge 처리
       - name: Check review and act
@@ -115,7 +112,4 @@ jobs:
             } else {
               console.log("Waiting for reviewer to approve.");
             }
-
-        env:
-          ORG_ACCESS_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN }}
-        token: ${{ secrets.ORG_ACCESS_TOKEN }}
+          token: ${{ secrets.ORG_ACCESS_TOKEN }}
